@@ -19,10 +19,15 @@
 #include "Adafruit_MQTT/Adafruit_MQTT_SPARK.h"
 #include "credentials.h"
 
+#include "SPI.h"
+#include "Wire.h"
+#include "Adafruit_GFX.h"
+#include "Adafruit_SSD1306.h"
+
 void setup();
 void loop();
 void MQTT_connect();
-#line 16 "c:/Users/DennisDavis/Documents/IoT/flowerPot-2nd-midterm/flower_pot_system/src/flower_pot_system.ino"
+#line 21 "c:/Users/DennisDavis/Documents/IoT/flowerPot-2nd-midterm/flower_pot_system/src/flower_pot_system.ino"
 TCPClient theClient;
 
 Adafruit_MQTT_SPARK mqtt(&theClient, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
@@ -56,11 +61,26 @@ bool status;
 int hexAddress = 0x76;
 unsigned long last, lastTime;
 int value1, value2;
+int SCREEN_WIDTH = 128;
+int SCREEN_HIGHT = 64;
+int OLED_RESET = D4;
+int SCREEN_ADDRESS = 0x3c;
+int lastPump;
+
+Adafruit_SSD1306 display(OLED_RESET);
 
 // SYSTEM_MODE(SEMI_AUTOMATIC)
 
 void setup() {
     Serial.begin(9600);
+
+    display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
+
+    display.display();
+    delay(2000);
+
+    display.clearDisplay();
+
     status = bme.begin(hexAddress);
     if (status == false) {
         Serial.printf("BME280 at address 0x%02X failed to start", hexAddress);
@@ -77,6 +97,7 @@ void setup() {
     }
 
     mqtt.subscribe(&mqttObj0);
+
 }
 
 void loop() {
@@ -134,6 +155,24 @@ void loop() {
         }
         lastTime = millis();
     }
+
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(0,0);
+    display.printf("soil reading:%i \nair reading:%i \ndust reading: %i \nTemp is:%0.2f \nHumidity:%0.2f\n", soilRead, airQuality, dustReading, tempF, hum);
+    display.display();
+    display.clearDisplay();
+
+    if ((millis() - lastPump >10000)){
+      if (soilRead > 1900){
+        digitalWrite(motor,HIGH);
+        delay(100);
+        digitalWrite(motor,LOW);
+      }
+      lastPump = millis();
+    }
+
+    
 }
 
 void MQTT_connect() {
