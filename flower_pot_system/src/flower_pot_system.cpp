@@ -163,10 +163,10 @@ void loop() {
     display.display();
     display.clearDisplay();
 
-    if ((millis() - lastPump >10000)){
+    if ((millis() - lastPump >2700000)){
       if (soilRead > 1900){
         digitalWrite(motor,HIGH);
-        delay(100);
+        delay(500);
         digitalWrite(motor,LOW);
       }
       lastPump = millis();

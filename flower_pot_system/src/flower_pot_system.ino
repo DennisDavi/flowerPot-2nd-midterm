@@ -13,10 +13,10 @@
 #include "Adafruit_MQTT/Adafruit_MQTT_SPARK.h"
 #include "credentials.h"
 
-#include "SPI.h"
-#include "Wire.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
+#include "SPI.h"
+#include "Wire.h"
 
 TCPClient theClient;
 
@@ -87,7 +87,6 @@ void setup() {
     }
 
     mqtt.subscribe(&mqttObj0);
-
 }
 
 void loop() {
@@ -148,21 +147,19 @@ void loop() {
 
     display.setTextSize(1);
     display.setTextColor(WHITE);
-    display.setCursor(0,0);
+    display.setCursor(0, 0);
     display.printf("soil reading:%i \nair reading:%i \ndust reading: %i \nTemp is:%0.2f \nHumidity:%0.2f\n", soilRead, airQuality, dustReading, tempF, hum);
     display.display();
     display.clearDisplay();
 
-    if ((millis() - lastPump >2700000)){
-      if (soilRead > 1900){
-        digitalWrite(motor,HIGH);
-        delay(500);
-        digitalWrite(motor,LOW);
-      }
-      lastPump = millis();
+    if ((millis() - lastPump > 2700000)) {
+        if (soilRead > 1900) {
+            digitalWrite(motor, HIGH);
+            delay(500);
+            digitalWrite(motor, LOW);
+        }
+        lastPump = millis();
     }
-
-    
 }
 
 void MQTT_connect() {
